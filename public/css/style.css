@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: calibri;
 }
 
 :root {
@@ -13,6 +14,35 @@
   --success: #22c55e;
   --danger: #ef4444;
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --navy: #0a1628;
+  --navy-light: #122040;
+  --navy-mid: #1c3461;
+  --amber: #f5a623;
+  --amber-light: #ffc84a;
+  --amber-dim: #c47d10;
+  --green: #00c896;
+  --green-dim: #00976f;
+  --red: #ff4d6a;
+  --sky: #4da8da;
+  --white: #ffffff;
+  --off-white: #f4f6fb;
+  --grey-100: #eef1f8;
+  --grey-300: #c8d0e0;
+  --grey-500: #8a95aa;
+  --grey-700: #4a5568;
+  --text: #1a2540;
+  --text-light: #6b7a99;
+  --border: rgba(200, 208, 224, 0.6);
+  --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.08);
+  --shadow-md: 0 8px 32px rgba(10, 22, 40, 0.14);
+  --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.2);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 ::-webkit-scrollbar {
@@ -32,6 +62,7 @@ body.dark {
   --accent: #818cf8;
   --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
 }
+
 body.scroll_false {
   overflow-y: hidden;
 }
@@ -43,12 +74,12 @@ body {
   margin-top: 65px;
   font-family: calibri;
 }
-
 /* nav */
 nav {
   height: 60px;
   width: 100%;
   background: var(--bg-sec);
+  border-bottom: 1px solid var(--amber);
   display: flex;
   align-items: center;
   padding: 0px 10px 0px 10px;
@@ -89,7 +120,7 @@ nav {
     width: 40px;
     padding: 1px;
     border-radius: 10px;
-    background: var(--bg-pri);
+    background: var(--amber);
     display: flex;
     justify-content: flex-start;
     box-shadow: var(--shadow);
@@ -109,15 +140,15 @@ nav {
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 30px;
+    height: 40px;
     padding: 0px 5px;
-    background: var(--bg-pri);
+    background: var(--amber);
     border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: var(--txt-sec);
+    color: var(--bg-sec);
     font-size: 18px;
     text-transform: capitalize;
     box-shadow: var(--shadow);
@@ -126,6 +157,9 @@ nav {
       width: 20px;
     }
   }
+  & .links a:hover{
+    border: 2px solid var(--navy);
+  }
 }
 
 .welcome {
@@ -133,6 +167,7 @@ nav {
   text-align: center;
   color: var(--txt-sec);
   margin-top: 65px;
+  font-size: 20px;
 }
 
 .date {
@@ -177,7 +212,6 @@ nav {
 
 /* form style */
 header {
-  min-height: 100vh;
   margin: 10px 0px;
   width: 100%;
   display: flex;
@@ -189,10 +223,10 @@ header {
     position: relative;
     display: flex;
     width: 90%;
-    height: auto;
-    background: linear-gradient(to right, var(--bg-sec) 50%, transparent);
+    background: linear-gradient(to right, var(--bg-pri) 50%, transparent);
     box-shadow: var(--shadow);
     border-radius: 10px;
+    border: 1px solid var(--amber-light);
     overflow: hidden;
     & .school_pic {
       width: 100%;
@@ -210,7 +244,7 @@ header {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px;
+      gap: 10px;
       flex-direction: column;
       z-index: 90;
       height: 100%;
@@ -237,30 +271,35 @@ header {
           width: 40px;
         }
         & h2 {
-          color: var(--txt-pri);
+          color: var(--amber-light);
           font-size: 30px;
           text-transform: capitalize;
           display: flex;
           align-items: center;
-          gap: 2px;
-          & span {
-            height: 3px;
-            width: 50px;
-            background: var(--txt-sec);
+          gap: 10px;
+          & img {
+            height: 40px;
+            width: 40px;
+            background: var(--amber);
+            padding: 5px;
+            border-radius: 5px;
           }
         }
         & h3 {
-          color: var(--txt-pri);
+          color: var(--amber-light);
           font-size: 15px;
           text-transform: capitalize;
           display: flex;
           align-items: center;
-          gap: 2px;
+          gap: 10px;
           & a {
-            padding: 0px 10px 0px 10px;
-            color: blue;
+            padding: 2px 10px 2px 10px;
+            color: var(--navy);
+            text-decoration: none;
             display: flex;
             align-items: center;
+            background: var(--amber);
+            border-radius: 5px;
             gap: 5px;
             & img {
               height: 20px;
@@ -278,46 +317,55 @@ header {
         display: flex;
         align-items: center;
         gap: 10px;
-        height: 40px;
+        height: 50px;
         width: 90%;
-        background: var(--bg-pri);
-        box-shadow: var(--shadow);
+        background: transparent;
         border-radius: 5px;
         & img {
-          height: 30px;
-          width: 30px;
-          margin-left: 10px;
+          height: 100%;
+          width: 45px;
+          background: var(--amber);
+          padding: 2px;
+          border-radius: 5px;
         }
         & input {
           width: 100%;
           height: 100%;
           outline: none;
           border: none;
-          background: transparent;
-          color: var(--txt-sec);
+          background: var(--amber);
+          color: var(--navy);
           font-size: 18px;
           text-transform: lowercase;
+          box-shadow: var(--shadow);
+          padding-left: 10px;
+          border-radius: 5px;
         }
         & input::placeholder {
           font-size: 18px;
+          color: var(--navy);
         }
       }
       & input[type='submit'] {
         width: 90%;
-        height: 40px;
+        height: 50px;
         border-radius: 5px;
         border: none;
         outline: none;
         font-size: 18px;
-        background: var(--bg-pri);
-        color: var(--txt-pri);
+        background: var(--amber);
+        color: var(--navy);
         box-shadow: var(--shadow);
         font-weight: bolder;
-        font-family: cursive;
         cursor: pointer;
+        text-transform: capitalize;
+      }
+      & input::placeholder {
+        color: var(--navy);
+        text-transform: capitalize;
       }
       & input[type='submit']:hover {
-        background: var(--accent);
+        background: var(--green-dim);
         cursor: pointer;
       }
     }
@@ -354,7 +402,7 @@ footer {
   & div {
     width: 49%;
     color: var(--txt-pri);
-    background: var(--bg-sec);
+    background: var(--amber);
     border-radius: 5px;
     display: flex;
     align-items: center;
@@ -389,6 +437,7 @@ footer {
   background: var(--bg-sec);
   color: var(--txt-pri);
   box-shadow: var(--shadow);
+  border: 1px solid var(--amber);
   & h1,
   h2,
   h3 {
@@ -428,8 +477,8 @@ footer {
     width: 49%;
     border-radius: 5px;
     overflow: hidden;
-    background: var(--bg-sec);
-    color: var(--txt-sec);
+    background: var(--amber);
+    color: var(--bg-pri);
     box-shadow: var(--shadow);
     & .department {
       font-size: 25px;
@@ -506,7 +555,7 @@ footer {
   }
 }
 
-.dept_details {
+.dept-details {
   padding: 10px;
   width: 100%;
   display: flex;
@@ -753,7 +802,7 @@ footer {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 5px;
       padding: 10px 0px 20px 0px;
       & h2 {
         color: var(--txt-pri);
@@ -773,7 +822,6 @@ footer {
         gap: 5px;
         background: var(--bg-pri);
         border-radius: 5px;
-        box-shadow: var(--shadow);
         padding-left: 10px;
         & select {
           width: 100%;
@@ -1018,7 +1066,7 @@ footer {
       width: 40px;
       padding: 1px;
       border-radius: 10px;
-      background: var(--bg-pri);
+      background: var(--amber);
       display: flex;
       justify-content: flex-start;
       box-shadow: var(--shadow);
@@ -1042,6 +1090,7 @@ footer {
       align-items: center;
       justify-content: center;
       font-size: 0px;
+      background: var(--amber);
       & img {
         height: 20px;
         width: 20px;
@@ -1050,7 +1099,10 @@ footer {
   }
 
   .welcome {
-    font-size: 15px;
+    font-size: 12px;
+    text-align: center;
+    width: 100%;
+    padding: 0px 5px;
   }
 
   .date {
@@ -1061,12 +1113,11 @@ footer {
     gap: 10px;
     & h2 {
       width: 100%;
-      height: auto;
-      padding: 5px;
+      height: 70px;
       background: var(--bg-sec);
       box-shadow: var(--shadow);
       border-radius: 5px;
-      padding-left: 10px;
+      padding-left: 5px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1086,7 +1137,7 @@ footer {
         justify-content: center;
         box-shadow: var(--shadow);
         border-radius: 5px;
-        font-size: 15px;
+        font-size: 12px;
       }
       & a:hover {
         background: var(--accent);
@@ -1161,7 +1212,7 @@ footer {
             text-transform: capitalize;
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 10px;
             & span {
               height: 3px;
               width: 50px;
@@ -1174,10 +1225,11 @@ footer {
             text-transform: capitalize;
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 10px;
             & a {
               padding: 0px 10px 0px 10px;
-              color: blue;
+              color: var(--navy);
+              text-decoration: none;
               display: flex;
               align-items: center;
               gap: 5px;
@@ -1199,26 +1251,29 @@ footer {
           gap: 10px;
           height: 40px;
           width: 100%;
-          background: var(--bg-pri);
-          box-shadow: var(--shadow);
+          background: transparent;
           border-radius: 5px;
           & img {
-            height: 30px;
-            width: 30px;
-            margin-left: 10px;
+            height: 100%;
+            width: 40px;
+            background: var(--amber);
+            padding: 2px;
+            border-radius: 5px;
           }
           & input {
             width: 100%;
             height: 100%;
             outline: none;
             border: none;
-            background: transparent;
+            background: var(--amber);
             color: var(--txt-sec);
             font-size: 15px;
             text-transform: lowercase;
+            color: var(--navy);
           }
           & input::placeholder {
             font-size: 10px;
+            color: var(--navy);
           }
         }
         & input[type='submit'] {
@@ -1228,11 +1283,10 @@ footer {
           border: none;
           outline: none;
           font-size: 18px;
-          background: var(--bg-pri);
-          color: var(--txt-pri);
+          background: var(--amber);
+          color: var(--bg-sec);
           box-shadow: var(--shadow);
           font-weight: bolder;
-          font-family: cursive;
           cursor: pointer;
         }
         & input[type='submit']:hover {
@@ -1271,17 +1325,18 @@ footer {
     padding: 10px;
     & div {
       width: 100%;
-      color: var(--txt-pri);
-      background: var(--bg-sec);
+      color: var(--bg-sec);
+      text-transform: capitalize;
+      background: var(--amber);
       border-radius: 5px;
       height: 60px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 10px;
       padding-left: 10px;
       padding: 5px;
       box-shadow: var(--shadow);
-      font-size: 18px;
+      font-size: 15px;
       & img {
         height: 30px;
         width: 30px;
@@ -1324,7 +1379,8 @@ footer {
     padding: 10px;
     & h2 {
       color: var(--txt-sec);
-      font-size: 18px;
+      font-size: 15px;
+      text-align: center;
     }
     & canvas {
       width: 100%;
@@ -1342,15 +1398,15 @@ footer {
       text-decoration: none;
       position: relative;
       z-index: 100;
-      height: 70px;
+      height: 100px;
       width: 100%;
       border-radius: 5px;
       overflow: hidden;
-      background: var(--bg-sec);
-      color: var(--txt-sec);
+      background: var(--amber);
+      color: var(--bg-sec);
       box-shadow: var(--shadow);
       & .department {
-        font-size: 25px;
+        font-size: 18px;
         position: absolute;
         top: 50%;
         left: 50%;
@@ -1365,17 +1421,17 @@ footer {
         }
       }
       & .stat {
-        font-size: 15px;
+        font-size: 12px;
         text-transform: uppercase;
         position: absolute;
-        bottom: 5px;
-        right: 10px;
+        bottom: 2px;
+        right: 2px;
       }
       & .percentage {
         font-size: 15px;
         position: absolute;
-        bottom: 5px;
-        left: 10px;
+        bottom: 2px;
+        left: 2espx;
       }
     }
     & .dept.complete::before {
@@ -1424,15 +1480,18 @@ footer {
     }
   }
 
-  .dept_details {
+  .dept-details {
     padding: 10px;
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    & h2 {
+      height: 50px;
+    }
     & .lost {
       width: 100%;
-      padding: 10px 10px;
+      padding: 10px 5px;
       background: var(--bg-sec);
       box-shadow: var(--shadow);
       border-radius: 5px;
@@ -1442,7 +1501,7 @@ footer {
         display: flex;
         align-items: center;
         gap: 5px;
-        font-size: 18px;
+        font-size: 15px;
         text-transform: capitalize;
         & img {
           height: 30px;
@@ -1456,7 +1515,7 @@ footer {
     & .status,
     .payment {
       width: 100%;
-      padding-left: 10px;
+      padding-left: 2px;
       background: var(--bg-sec);
       box-shadow: var(--shadow);
       border-radius: 5px;
@@ -1466,9 +1525,9 @@ footer {
         display: flex;
         align-items: center;
         gap: 10px;
-        height: auto;
-        padding: 5px;
-        font-size: 18px;
+        height: 70px;
+        padding: 2px;
+        font-size: 15px;
         text-transform: capitalize;
         & img {
           height: 30px;
@@ -1662,7 +1721,7 @@ footer {
     justify-content: center;
     min-height: 100vh;
     & .forms {
-      width: 99%;
+      width: 95%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1674,8 +1733,8 @@ footer {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
-        padding: 10px 0px 20px 0px;
+        gap: 5px;
+        padding: 10px 0px 10px 0px;
         & h2 {
           color: var(--txt-pri);
           display: flex;
@@ -1688,13 +1747,12 @@ footer {
         }
         & label {
           width: 100%;
-          height: 40px;
+          height: 50px;
           display: flex;
           align-items: center;
           gap: 5px;
           background: var(--bg-pri);
-          border-radius: 5px;
-          box-shadow: var(--shadow);
+          border-radius: 2px;
           padding-left: 10px;
           & select {
             width: 100%;
@@ -1719,6 +1777,7 @@ footer {
             color: var(--txt-pri);
             height: 100%;
             outline: none;
+            padding-left: 10px;
           }
         }
         & input[type='submit'] {
@@ -1747,12 +1806,12 @@ footer {
     z-index: 200;
     & .close {
       position: absolute;
-      top: 5px;
+      top: 10px;
       right: 5px;
       display: flex;
       color: var(--txt-pri);
       height: 20px;
-      width: 100px;
+      width: auto;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1780,6 +1839,7 @@ footer {
       flex-direction: column;
       gap: 10px;
       align-items: center;
+      text-align: center;
       & button {
         height: 40px;
         width: 150px;
@@ -1800,11 +1860,12 @@ footer {
     & .alert_title {
       position: absolute;
       width: 100%;
-      top: 30px;
+      top: 50px;
       text-align: center;
       text-transform: uppercase;
       color: green;
-      font-size: 25px;
+      font-size: 20px;
+      text-align: center;
     }
   }
 

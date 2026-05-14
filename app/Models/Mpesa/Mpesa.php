@@ -2,50 +2,100 @@
 
 namespace App\Models\Mpesa;
 
-use Dotenv\Dotenv;
-
-$dotenv = Dotenv::createImmutable(ROOT);
-$dotenv->load();
-abstract class Mpesa
+class Mpesa
 {
-    private static function Access_token()
-    {
-        $credentials = base64_encode($_ENV['CONSUMER_KEY'] . ':' . $_ENV['CONSUMER_SECRET']);
-        $url = $_ENV['AUTH_URL'];
 
+    private function accessToken()
+    {
+        // 1. Validate environment variables
+        $consumerKey = $_ENV['CONSUMER_KEY'] ?? null;
+        $consumerSecret = $_ENV['CONSUMER_SECRET'] ?? null;
+        $url = $_ENV['AUTH_URL'] ?? null;
+
+        if (!$consumerKey || !$consumerSecret || !$url) {
+            error_log("M-Pesa Error: Missing Consumer Key, Secret, or Auth URL in .env");
+            return false;
+        }
+
+        // 2. Prepare the Basic Auth credentials
+        $credentials = base64_encode(trim($consumerKey) . ':' . trim($consumerSecret));
+
+        // 3. Initialize cURL
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Basic ' . $credentials]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Basic ' . $credentials,
+            'Content-Type: application/json'
+        ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // Ensure SSL is handled correctly (standard for Daraja)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
         $response = curl_exec($ch);
-        curl_close($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        echo $curlError = curl_error($ch);
+
+        // 4. Handle Errors
+        if ($curlError) {
+            error_log("M-Pesa cURL Error: " . $curlError);
+            return false;
+        }
 
         $result = json_decode($response, true);
+
         print_r($result);
 
-        return $result['access_token'];
+        // 5. Check if the token exists in the response
+        if ($httpCode === 200 && isset($result['access_token'])) {
+            echo "hello";
+            return $result['access_token'] ?? "clear-pass";
+        }
+
+        error_log("M-Pesa Auth Failed (HTTP $httpCode): " . ($result['errorMessage'] ?? 'Unknown Error'));
+        return false;
     }
-    public static function Stk_push(int $phone, int $amount)
+
+    public function stkPush($phone, $amount)
     {
-        $token = self::Access_token();
+        // 1. Get Access Token
+        echo $token = $this->accessToken() . PHP_EOL;
+
+        if ($token === "clear-pass") {
+             echo $error = 'Could not generate access token';
+         }
+
+        // 2. Prepare Variables from .env
+        $shortCode = trim($_ENV['SHORTCODE']);
+        $passkey   = trim($_ENV['PASSKEY']);
         $timestamp = date('YmdHis');
-        $password = base64_encode($_ENV['SHORTCODE'] . $_ENV['PASSKEY'] . $timestamp);
 
+        // The password must be base64 encoded: Shortcode + Passkey + Timestamp
+        $password = base64_encode($shortCode . $passkey . $timestamp);
+
+        // 3. Format Phone Number (Ensuring 254... format)
+        $phone = (string)$phone;
+        $phone = str_replace(['+', ' '], '', $phone);
+        if (str_starts_with($phone, '0')) {
+            $phone = '254' . substr($phone, 1);
+        } elseif (str_starts_with($phone, '7') || str_starts_with($phone, '1')) {
+            $phone = '254' . $phone;
+        }
+
+        // 4. Build the Payload
         $payload = [
-            'ShortCode' => $_ENV['SHORTCODE'],
-            'CommandID' => 'CustomerPayBillOnline',
-            'Password'          => $password,
-            'Timestamp'         => $timestamp,
-            'Amount'            => $amount,
-            'PartyA'            => $phone,
-            'PartyB'            => 174379,
-            'Msisdn'       => $phone,
-            'CallBackURL'       => $_ENV['CALLBACK_URL'],
-            'AccountReference'  => 'Test123',
-            'TransactionDesc'   => 'Payment',
-
+            "BusinessShortCode" => trim($shortCode),
+            "Password"          => $password,
+            "Timestamp"         => $timestamp,
+            "TransactionType"   => "CustomerPayBillOnline",
+            "Amount"            => round($amount),
+            "PartyA"            => trim($phone),
+            "PartyB"            => trim($shortCode),
+            //"PhoneNumber"       => trim($phone),
+            "CallBackURL"       => trim($_ENV['CALLBACK_URL']),
+            "AccountReference"  => substr(str_replace(' ', '', 'ClearPass_System'), 0, 12),
+            "TransactionDesc"   => substr('Student Clearance Fees', 0, 20)
         ];
 
+        // 5. Execute cURL Request
         $url = $_ENV['STKPUSH_URL'];
 
         $ch = curl_init($url);
@@ -57,70 +107,64 @@ abstract class Mpesa
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+        //curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        // Recommended: disable SSL verification ONLY for local development if needed
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
         $response = curl_exec($ch);
-        curl_close($ch);
+        print_r($response);
+        $error = curl_error($ch);
+
+        if ($error) {
+            return ['error' => 'cURL Error: ' . $error];
+        }
+
         return json_decode($response, true);
     }
-    private static function Callback()
+    public function callback()
     {
-        header("Content-Type: application/json");
+        // 1. Capture the raw input
+        $stkcallbackResponse = file_get_contents('php://input');
+        $logFile = ROOT . "/logs/mpesa-logs/file.log";
+        file_put_contents($logFile, $stkcallbackResponse . PHP_EOL, FILE_APPEND);
 
-        $stkCallbackResponse = file_get_contents('php://input');
-        $logFile = "logs/mpesa_responses.log";
+        $data = json_decode($stkcallbackResponse);
 
-        // Log the response for debugging
-        file_put_contents($logFile, $stkCallbackResponse . PHP_EOL, FILE_APPEND);
+        // Check if decoding worked and if the path exists
+        if (!$data || !isset($data->Body->stkCallback)) {
+            return;
+        }
 
-        $data = json_decode($stkCallbackResponse);
-        $resultCode = $data->Body->stkCallback->ResultCode;
+        $stkCallback = $data->Body->stkCallback;
+        $resultCode = $stkCallback->ResultCode;
+        $checkoutRequestID = $stkCallback->CheckoutRequestID;
 
         if ($resultCode == 0) {
-            // Payment Successful
-            $metadata = $data->Body->stkCallback->CallbackMetadata->Item;
-            $mpesaReceiptNumber = $metadata[1]->Value;
-            $amount = $metadata[0]->Value;
-            $phoneNumber = $metadata[4]->Value;
-
-            // TODO: Update your database (studentgeneraldata) set status = 'online'
-        }
-
-        echo json_encode(["ResultCode" => 0, "ResultDesc" => "Success"]);
-
-        include 'db_connect.php'; // Your existing database connection
-        header("Content-Type: application/json");
-
-        $stkCallbackResponse = file_get_contents('php://input');
-        $data = json_decode($stkCallbackResponse);
-
-        if ($data->Body->stkCallback->ResultCode == 0) {
-            // 1. Get the Metadata
-            $items = $data->Body->stkCallback->CallbackMetadata->Item;
-
-            // The MerchantRequestID or AccountReference helps identify the student
-            // In many Daraja versions, the reference is passed back or can be tracked via CheckoutRequestID
-            $checkoutID = $data->Body->stkCallback->CheckoutRequestID;
+            $items = $stkCallback->CallbackMetadata->Item;
             $amount = 0;
+            $receipt = "";
+            $phone = "";
 
             foreach ($items as $item) {
-                if ($item->Name == "Amount") $amount = $item->Value;
-                if ($item->Name == "MpesaReceiptNumber") $receipt = $item->Value;
+                switch ($item->Name) {
+                    case "Amount":
+                        $amount = $item->Value;
+                        break;
+                    case "MpesaReceiptNumber":
+                        $receipt = $item->Value;
+                        break;
+                    case "PhoneNumber":
+                        $phone = $item->Value;
+                        break;
+                }
             }
 
-            // 2. Update the database
-            // Note: You need to have stored the CheckoutRequestID in a temp table 
-            // OR use the phone number/reference to find the student.
-
-            // Example: Updating finance status to 'online' for that student
-            $stmt = $db_connect->prepare("UPDATE studentgeneraldata SET `finance status` = 'online', `finance value` = `finance value` - ? WHERE admission = ?");
-
-            // You'll need to logic to map the checkoutID back to the admission number
-            // For this example, let's assume you track by phone:
-            $phoneNumber = $data->Body->stkCallback->CallbackMetadata->Item[4]->Value;
-
-            $stmt->bind_param("ds", $amount, $admission_from_lookup);
-            $stmt->execute();
+            // TODO: Database update logic here
+            // Tip: Use $checkoutRequestID to find which student initiated the payment
         }
 
+        // Single source of truth for the response
+        header("Content-Type: application/json");
         echo json_encode(["ResultCode" => 0, "ResultDesc" => "Accepted"]);
     }
 }
